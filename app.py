@@ -1,25 +1,31 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
+from pymongo import MongoClient
 
 app = Flask(__name__)
-CORS(app)  # CORS 문제 예방
+CORS(app)
 
-@app.route('/submit', methods=['POST'])
-def submit_rank():
-    data = request.get_json()
-    if not data:
-        return jsonify({'error': 'No JSON data received'}), 400
+# ✅ 여기에 URI 삽입
+client = MongoClient("mongodb+srv://bchdaeuo:5Bf9gbd589!@cluster0.053hdai.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 
-    print("[서버] 랭킹 데이터 수신:", data)
-    # 여기서 MongoDB 저장 로직 넣으면 됩니다.
+# 원하는 DB와 컬렉션 선택
+db = client["EduProject"]
+ranking_collection = db["Rankings"]
 
-    return jsonify({'status': 'success', 'message': 'Ranking submitted successfully'})
+@app.route("/submit", methods=["POST"])
+def submit_ranking():
+    try:
+        data = request.get_json()
+        print("[수신된 데이터]", data)
+        ranking_collection.insert_one(data)
+        return jsonify({"status": "success", "message": "Ranking submitted successfully"}), 200
+    except Exception as e:
+        print("[오류]", e)
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/')
-def index():
+@app.route("/")
+def home():
     return "Edu Project Ranking Server"
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
