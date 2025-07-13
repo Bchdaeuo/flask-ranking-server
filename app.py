@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # ✅ 여기에 URI 삽입
-client = MongoClient("mongodb+srv://bchdaeuo:5Bf9gbd589!@cluster0.053hdai.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+client = MongoClient("mongodb+srv://bchdaeuo:bchdaeuo@cluster0.053hdai.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 
 # 원하는 DB와 컬렉션 선택
 db = client["EduProject"]
