@@ -8,12 +8,12 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 CORS(app)
 
-# ✅ MongoDB 연결
+# MongoDB 연결
 client = MongoClient("mongodb+srv://bchdaeuo:bchdaeuo@cluster0.053hdai.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 db = client["EduProject"]
 ranking_collection = db["Rankings"]
 
-# ✅ 닉네임이 null일 때 대체하는 정리 함수
+# 닉네임이 null일 때 대체하는 정리 함수
 def clean_record(record):
     return {
         "nickname": record.get("nickname", "익명") if record.get("nickname") != "null" else "익명",
@@ -25,19 +25,43 @@ def clean_record(record):
         "correct_rate": record.get("correct_rate", 0)
     }
 
-# ✅ 랭킹 제출
+# 랭킹 제출
 @app.route("/submit", methods=["POST"])
 def submit_ranking():
     try:
         data = request.get_json()
         logging.info(f"[수신된 데이터] {data}")
+
+        # 중복 데이터 체크 조건
+        duplicate_check = {
+            "uid": data.get("uid"),
+            "game_mode": data.get("game_mode"),
+            "grade_score": data.get("grade_score"),
+            "level": data.get("level"),
+            "grade": data.get("grade"),
+            "elapsed_time": data.get("elapsed_time"),
+            "correct_rate": data.get("correct_rate"),
+        }
+
+        # 중복 여부 확인
+        existing = ranking_collection.find_one(duplicate_check)
+
+        if existing:
+            logging.warning("[중복 제출] 동일한 랭킹이 이미 존재합니다")
+            return jsonify({
+                "status": "duplicate",
+                "message": "이미 랭킹에 등록되었습니다"
+            }), 409
+
+        # 새로운 데이터 저장
         ranking_collection.insert_one(data)
         return jsonify({"status": "success", "message": "Ranking submitted successfully"}), 200
+
     except Exception as e:
         logging.error(f"[제출 오류] {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# ✅ 랭킹 조회
+# 랭킹 조회
 @app.route("/get_ranking", methods=["GET"])
 def get_ranking():
     try:
@@ -73,11 +97,11 @@ def get_ranking():
         logging.error(f"[랭킹 조회 오류] {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# ✅ 기본 루트
+# 기본 루트
 @app.route("/")
 def home():
     return "Edu Project Ranking Server is running"
 
-# ✅ 서버 실행
+# 서버 실행
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
