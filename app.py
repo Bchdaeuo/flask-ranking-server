@@ -42,7 +42,7 @@ def submit_ranking():
 def get_ranking():
     try:
         mode = request.args.get("mode", "all")
-        base_query = {"grade_score": {"$gt": 0}}
+        base_query = {"grade_score": {"$gte": 0}}
 
         if mode == "classic":
             base_query["game_mode"] = "클래식"
