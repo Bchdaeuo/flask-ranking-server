@@ -100,7 +100,7 @@ def get_ranking():
 # 기본 루트
 @app.route("/")
 def home():
-    return "Edu Project Ranking Server is running"
+    return "랭킹 서버가 원활히 작동하고 있습니다."
 
 # 서버 실행
 if __name__ == '__main__':
