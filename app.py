@@ -79,6 +79,7 @@ def get_ranking():
                 base_query,
                 {
                     "_id": 0,
+                    "uid": 1,
                     "nickname": 1,
                     "game_mode": 1,
                     "grade_score": 1,
@@ -105,3 +106,4 @@ def home():
 # 서버 실행
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
