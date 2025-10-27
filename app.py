@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
-import logging
+import logging, psutil
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -137,3 +137,4 @@ def metrics():
 # 서버 실행
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
